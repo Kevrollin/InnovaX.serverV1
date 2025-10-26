@@ -78,6 +78,7 @@ app.get('/health', async (req, res) => {
       database: dbConnected ? 'connected' : 'disconnected',
       uptime: process.uptime(),
       memory: process.memoryUsage(),
+      platform: 'vercel'
     });
   } catch (error) {
     res.status(503).json({
@@ -85,6 +86,7 @@ app.get('/health', async (req, res) => {
       timestamp: new Date().toISOString(),
       environment: config.app.env,
       error: error.message,
+      platform: 'vercel'
     });
   }
 });
@@ -95,6 +97,13 @@ app.get('/', (req, res) => {
     message: 'FundHub API',
     version: '1.0.0',
     status: 'healthy',
+    platform: 'vercel',
+    environment: config.app.env,
+    endpoints: {
+      health: '/health',
+      apiDocs: '/api-docs',
+      api: '/api'
+    }
   });
 });
 

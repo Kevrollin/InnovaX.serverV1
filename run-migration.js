@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 
+// Load environment variables
+require('dotenv').config();
+
 const { Client } = require('pg');
 const fs = require('fs');
 const path = require('path');
 
 // Database connection string
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_1rjCN4eJQmPY@ep-wild-morning-a4gz3alv-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require';
+const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://fundhub_user:fundhub123@localhost:5432/fundhubdev';
 
 // Colors for console output
 const colors = {
@@ -25,10 +28,7 @@ function log(message, color = 'reset') {
 
 async function runMigration() {
   const client = new Client({
-    connectionString: DATABASE_URL,
-    ssl: {
-      rejectUnauthorized: false
-    }
+    connectionString: DATABASE_URL
   });
 
   try {

@@ -12,7 +12,6 @@
     "migrate:simple": "node run-migration-simple.js",
     "check-tables": "node check-tables.js",
     "check-users": "node check-users-table.js",
-    "vercel-build": "echo 'Vercel build completed'",
     "postinstall": "echo 'Dependencies installed successfully'"
   },
   "keywords": [],

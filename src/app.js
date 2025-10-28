@@ -20,10 +20,7 @@ app.use(cors({
     
     const allowedOrigins = config.cors.origins;
     
-    // Temporary fix: Allow innovax-ui.vercel.app specifically
-    if (origin === 'https://innovax-ui.vercel.app' || 
-        allowedOrigins.includes('*') || 
-        allowedOrigins.includes(origin)) {
+    if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
     

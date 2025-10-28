@@ -1,16 +1,42 @@
 const { Sequelize } = require('sequelize');
 const config = require('./index');
 
-// Create Sequelize instance
+// Create Sequelize instance with Vercel-optimized settings
 const sequelize = new Sequelize(config.database.url, {
   logging: config.database.logging ? console.log : false,
   dialect: 'postgres',
+  dialectOptions: {
+    ssl: process.env.NODE_ENV === 'production' ? {
+      require: true,
+      rejectUnauthorized: false
+    } : false
+  },
   pool: {
-    max: 5,
+    max: process.env.NODE_ENV === 'production' ? 1 : 5, // Limit connections in serverless
     min: 0,
     acquire: 30000,
     idle: 10000,
   },
+  retry: {
+    match: [
+      /ETIMEDOUT/,
+      /EHOSTUNREACH/,
+      /ECONNRESET/,
+      /ECONNREFUSED/,
+      /ETIMEDOUT/,
+      /ESOCKETTIMEDOUT/,
+      /EHOSTUNREACH/,
+      /EPIPE/,
+      /EAI_AGAIN/,
+      /SequelizeConnectionError/,
+      /SequelizeConnectionRefusedError/,
+      /SequelizeHostNotFoundError/,
+      /SequelizeHostNotReachableError/,
+      /SequelizeInvalidConnectionError/,
+      /SequelizeConnectionTimedOutError/
+    ],
+    max: 3
+  }
 });
 
 // Test the connection

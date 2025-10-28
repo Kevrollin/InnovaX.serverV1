@@ -2,21 +2,21 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/test-cors.js",
+      "src": "api/ultra-minimal.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "api/test-cors.js"
+      "dest": "api/ultra-minimal.js"
     }
   ],
   "env": {
     "NODE_ENV": "production"
   },
   "functions": {
-    "api/test-cors.js": {
+    "api/ultra-minimal.js": {
       "maxDuration": 30
     }
   }

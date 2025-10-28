@@ -20,7 +20,10 @@ app.use(cors({
     
     const allowedOrigins = config.cors.origins;
     
-    if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+    // Temporary fix: Allow innovax-ui.vercel.app specifically
+    if (origin === 'https://innovax-ui.vercel.app' || 
+        allowedOrigins.includes('*') || 
+        allowedOrigins.includes(origin)) {
       return callback(null, true);
     }
     
@@ -65,8 +68,43 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customCss: '.swagger-ui .topbar { display: none }',
 }));
 
+// Simple test endpoint
+app.get('/test', (req, res) => {
+  res.json({
+    message: 'Test endpoint working',
+    timestamp: new Date().toISOString(),
+    environment: config.app.env,
+    platform: 'vercel'
+  });
+});
+
 // Health check
 app.get('/health', async (req, res) => {
+  try {
+    // Don't test database connection in serverless environment to avoid cold start issues
+    // Just return basic health status
+    res.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      environment: config.app.env,
+      platform: 'vercel',
+      uptime: process.uptime(),
+      memory: process.memoryUsage(),
+      version: '1.0.0'
+    });
+  } catch (error) {
+    res.status(503).json({
+      status: 'unhealthy',
+      timestamp: new Date().toISOString(),
+      environment: config.app.env,
+      error: error.message,
+      platform: 'vercel'
+    });
+  }
+});
+
+// Database health check (separate endpoint)
+app.get('/health/db', async (req, res) => {
   try {
     const { testConnection } = require('./config/database');
     const dbConnected = await testConnection();
@@ -76,8 +114,6 @@ app.get('/health', async (req, res) => {
       timestamp: new Date().toISOString(),
       environment: config.app.env,
       database: dbConnected ? 'connected' : 'disconnected',
-      uptime: process.uptime(),
-      memory: process.memoryUsage(),
       platform: 'vercel'
     });
   } catch (error) {
@@ -101,6 +137,7 @@ app.get('/', (req, res) => {
     environment: config.app.env,
     endpoints: {
       health: '/health',
+      databaseHealth: '/health/db',
       apiDocs: '/api-docs',
       api: '/api'
     }
